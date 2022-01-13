@@ -12,7 +12,7 @@ def deconvolution(data, weight):
     wt_num = shape[1]
     n_opt = wt_num - 1
 
-    ###disorder_1
+    ###disorder
     tmp = data[0].copy()
     t_n = (num // wt_num) * wt_num
     for i in range(1, t_n):
@@ -21,7 +21,7 @@ def deconvolution(data, weight):
     for i in range(1, t_n):
         data[0][t_n-i] = data[0][t_n-i] ^ data[0][t_n-i-1]
 
-    ###opt_1
+    ###opt
     for i in range(0, num):
         for j in range(0, n_opt):
             if (i-n_opt+j) < 0:
@@ -29,21 +29,6 @@ def deconvolution(data, weight):
             else:
                 data[0][i] = int(data[0][i]) - int(weight[0][j] ^ data[0][i-n_opt+j])
         data[0][i] = data[0][i] ^ weight[0][n_opt]
-
-    ###opt_2
-    #for i in range(0, num):
-    #    for j in range(0, n_opt):
-    #        if (n_opt - j) % 2 == 0:
-    #            if (i-n_opt+j) < 0:
-    #                data[0][i] = int(data[0][i]) + int(weight[0][j])
-    #            else:
-    #                data[0][i] = int(data[0][i]) + int(weight[0][j] ^ data[0][i-n_opt+j])
-    #        else:
-    #            if (i-n_opt+j) < 0:
-    #                data[0][i] = int(data[0][i]) - int(weight[0][j])
-    #            else:
-    #                data[0][i] = int(data[0][i]) - int(weight[0][j] ^ data[0][i-n_opt+j])
-    #    data[0][i] = data[0][i] ^ weight[0][n_opt]
 
     return data[0]
 
@@ -58,8 +43,8 @@ def readImages(npy_path): #direct = './train/'
 
 def allImageToLayer(data, wt): #0(r), 1(g), 2(b), 3(grey)
     I0 = data
-    I0 = I0.reshape(I0.size)  # 二维图像转变成一维
-    xordt0 = layerNoWeight(wt, I0)  # 连接层运算
+    I0 = I0.reshape(I0.size)  
+    xordt0 = layerNoWeight(wt, I0) 
     xordt0 = xordt0.reshape(data.shape[0], data.shape[1])
     data = xordt0
     return data
