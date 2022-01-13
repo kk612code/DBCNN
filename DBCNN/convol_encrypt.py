@@ -25,28 +25,17 @@ def convolution(data, weight):
     for i in range(0, wt_num):
         data[i] = weight[0][wt_num-1-i] ^ data[i]
 
-    ###opt_1
+    ###opt
     for i in range(1, wt_num):
             data[0] = np.add(data[0], data[i])
 
-    ###opt_2
-    # for i in range(1, wt_num):
-    #     if i % 2 == 1:
-    #         data[0] = np.add(data[0], data[i])
-    #     else:
-    #         data[0] = np.subtract(data[0], data[i])
-
-    ###disorder_1
+    ###disorder
     tmp = data[0].copy()
     t_n = (dt_num // wt_num) * wt_num
     for i in range(1, t_n):
         j = (i % wt_num) * (dt_num // wt_num) + (i // wt_num)
         tmp[i] = tmp[i] ^ tmp[i-1]
         data[0][j] = tmp[i]
-
-    ###disorder_2
-    # for i in range(1, dt_num):
-    #     data[0][i] = data[0][i] ^ data[0][i-1]
 
     return data[0]
 
@@ -67,28 +56,28 @@ def readImages(direct): #direct = './train/'
                 data.append(image)
     return data
 
-#统计每个值出现的频率
+#Count how often each value occurs
 def distribute(data, maxv=256):
     leng = len(data)
     uni, count = np.unique(data, return_counts=True)
     return np.pad(count, (0, 256 - len(count)), mode='constant')/leng #(1,256)
 
-#计算均匀分布（uniform）于给定数据（data）分布间的KL散度值
+#Calculates the KL divergence value of a uniform distribution over a given data distribution
 uniform = [1./256. for i in range(0, 256)]
 def computUniform(data, pre=uniform):
     data = data + np.spacing(1)
-    div = np.dot(pre, np.log(pre / data)) #点对点运算后再内积，pre是（1，256），data是（1，256）
+    div = np.dot(pre, np.log(pre / data)) 
     return div
 
 def allImageToLayer(data, n1=1, n2=2): #0(r), 1(g), 2(b), 3(grey)
-    wt = convolution_weight(n1, n2) #获得初始化权值
+    wt = convolution_weight(n1, n2) #get initialized weights
     num = len(data)
     xordata = []
     div0 = 0
     for i in range(0, num):
-        I0 = data[i] #取单张图片data[i]
+        I0 = data[i] 
         I0 = I0.reshape(I0.size)
-        xordt0 = layerNoWeight(wt, I0) #连接层运算
+        xordt0 = layerNoWeight(wt, I0) 
         dis0 = distribute(xordt0)
         div0 += computUniform(dis0)
         xordt0 = xordt0.reshape(data[i].shape[0], data[i].shape[1])
